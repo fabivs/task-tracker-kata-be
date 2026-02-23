@@ -1,5 +1,39 @@
-# kotlin-task-tracker-be-kata
+# Kotlin Task Management System Kata (Backend)
 
+# Assignment
+The goal of this assignment is to deliver a production-grade ready and functional application.
+The application will consist of two separate applications, a backend and a frontend.
+
+## Core Technology Stack Guidelines
+You should use the following technologies:
+- **Backend**: Kotlin
+- **Frontend**: Next.js or React
+- **API Protocol**: HTTP(REST)
+- **Docker**: A `docker-compose.yml` file for quick setup
+
+_Note on Persistence_: Data persistence for tasks can be managed using an in-memory
+data structure or a database depending on your choice and effort required.
+
+The backend and frontend will be two different projects in separate repositories,this is the **Backend application**.
+
+## Functional requirements
+You are required to build a Personal Task Management Application that allows a user to
+manage a simple to-do list.
+
+**Task Management**
+- **Creation**: The user must be able to create a new task.
+- **Viewing**: The application must display all tasks.
+- **Update**: The user needs a way to update the task's detail and status.
+- **Filtering**: The user should be able to filter the displayed task list.
+
+## Bonus features (nice-to-haves)
+- **Authentication**: Implement a simple authentication mechanism to associate tasks
+with a single user.
+- **CI/CD Workflow**
+- **API Routes in NextJS**
+You can also incorporate any additional features you deem appropriate.
+
+# Run the project (TODO)
 This project was created using the [Ktor Project Generator](https://start.ktor.io).
 
 Here are some useful links to get you started:
