@@ -4,18 +4,16 @@ val logback_version: String by project
 plugins {
     kotlin("jvm") version "2.3.0"
     id("io.ktor.plugin") version "3.4.0"
+    id("com.ncorti.ktfmt.gradle") version "0.25.0"
 }
 
 group = "com.example"
+
 version = "0.0.1"
 
-application {
-    mainClass = "io.ktor.server.netty.EngineMain"
-}
+application { mainClass = "io.ktor.server.netty.EngineMain" }
 
-kotlin {
-    jvmToolchain(21)
-}
+kotlin { jvmToolchain(21) }
 
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
@@ -26,3 +24,5 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
+
+ktfmt { kotlinLangStyle() }
