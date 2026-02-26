@@ -1,11 +1,14 @@
 # Kotlin Task Management System Kata (Backend)
 
 # Assignment
+
 The goal of this assignment is to deliver a production-grade ready and functional application.
 The application will consist of two separate applications, a backend and a frontend.
 
 ## Core Technology Stack Guidelines
+
 You should use the following technologies:
+
 - **Backend**: Kotlin
 - **Frontend**: Next.js or React
 - **API Protocol**: HTTP(REST)
@@ -17,58 +20,69 @@ data structure or a database depending on your choice and effort required.
 The backend and frontend will be two different projects in separate repositories,this is the **Backend application**.
 
 ## Functional requirements
+
 You are required to build a Personal Task Management Application that allows a user to
 manage a simple to-do list.
 
 **Task Management**
+
 - **Creation**: The user must be able to create a new task.
 - **Viewing**: The application must display all tasks.
 - **Update**: The user needs a way to update the task's detail and status.
 - **Filtering**: The user should be able to filter the displayed task list.
 
 ## Bonus features (nice-to-haves)
+
 - **Authentication**: Implement a simple authentication mechanism to associate tasks
 with a single user.
 - **CI/CD Workflow**
 - **API Routes in NextJS**
 You can also incorporate any additional features you deem appropriate.
 
-# Run the project (TODO)
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+# Run the project
 
-Here are some useful links to get you started:
+Requirements:
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+- JDK and Gradle
+- Docker (if opting for running the application with Docker)
+- Make (not strictly required, you can run the gradle and docker commands inside the Makefile manually)
 
-## Features
+Note: use `$ make help` to see all available make commands.
 
-Here's a list of features included in this project:
+Alternatively, you can also use the IntelliJ Idea IDE to perform all of these tasks.
 
-| Name                                               | Description                                                 |
-|----------------------------------------------------|-------------------------------------------------------------|
-| [Routing](https://start.ktor.io/p/routing-default) | Allows to define structured routes and associated handlers. |
+## Without Docker
 
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-|-----------------------------------------|----------------------------------------------------------------------|
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
+Start the project:
 
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+make build
+make run
 ```
 
+The APIs will be available locally at: <http://127.0.0.1:8080>.
+
+Example usages: -- TODO: add example APIs
+
+- `GET http://127.0.0.1:8080/xxx/yyy`
+
+Run the tests:
+
+```
+make test
+```
+
+## Within a Docker container
+
+A `Dockerfile` has been provided to build a docker image for the project.
+
+Build the docker image for the project:
+
+```
+make build-docker
+```
+
+Run the image (on port 8080):
+
+```
+make run-docker
