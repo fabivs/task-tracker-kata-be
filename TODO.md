@@ -5,6 +5,7 @@
 - [x] Add Dockerfile (from official documentation)
 - [x] Add Makefile
 - [x] Add instructions in README
+- [x] Rename project root inside code from `example` to `tasktracker`
 
 ## Functionalities
 
