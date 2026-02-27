@@ -1,6 +1,8 @@
 package com.tasktracker.repository
 
 import com.tasktracker.domain.Task
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,5 +51,35 @@ class InMemoryTaskRepositoryTest {
     @Test
     fun `delete returns null when the task does not exist`() {
         assertNull(repository.delete(UUID.randomUUID()))
+    }
+
+    @Test
+    fun `findAll filters correctly by user, creationDate, and isCompleted`() {
+        val specificDate = LocalDate.of(2020, 1, 15)
+
+        val taskByUser = Task.create(user = "alice", title = "Alice's task")
+        val taskByDate =
+            Task.create(
+                user = "bob",
+                title = "Bob's task",
+                creationDate = LocalDateTime.of(2020, 1, 15, 10, 0),
+            )
+        val completedTask = Task.create(user = "carol", title = "Carol's task").complete()
+
+        repository.save(taskByUser)
+        repository.save(taskByDate)
+        repository.save(completedTask)
+
+        val byUser = repository.findAll(user = "alice")
+        assertEquals(1, byUser.size)
+        assertTrue(byUser.contains(taskByUser))
+
+        val byDate = repository.findAll(creationDate = specificDate)
+        assertEquals(1, byDate.size)
+        assertTrue(byDate.contains(taskByDate))
+
+        val byCompleted = repository.findAll(isCompleted = true)
+        assertEquals(1, byCompleted.size)
+        assertTrue(byCompleted.contains(completedTask))
     }
 }

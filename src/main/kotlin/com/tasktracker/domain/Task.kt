@@ -1,8 +1,7 @@
 package com.tasktracker.domain
 
+import java.time.LocalDateTime
 import java.util.UUID
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @ConsistentCopyVisibility
 data class Task
@@ -12,8 +11,9 @@ private constructor(
     val title: String,
     val description: String,
     val isCompleted: Boolean,
-    val creationDate: Instant,
-    val completionDate: Instant?,
+    // opted to use LocalDateTime and avoid timezones for simplicity
+    val creationDate: LocalDateTime,
+    val completionDate: LocalDateTime?,
 ) {
     companion object {
         fun create(
@@ -21,13 +21,14 @@ private constructor(
             user: String,
             title: String,
             description: String = "",
+            creationDate: LocalDateTime = LocalDateTime.now(),
         ) =
             Task(
                 id = id,
                 user = user,
                 title = title,
                 description = description,
-                creationDate = Clock.System.now(),
+                creationDate = creationDate,
                 isCompleted = false,
                 completionDate = null,
             )
@@ -36,5 +37,5 @@ private constructor(
     fun update(title: String? = null, description: String? = null) =
         copy(title = title ?: this.title, description = description ?: this.description)
 
-    fun complete() = copy(isCompleted = true, completionDate = Clock.System.now())
+    fun complete() = copy(isCompleted = true, completionDate = LocalDateTime.now())
 }

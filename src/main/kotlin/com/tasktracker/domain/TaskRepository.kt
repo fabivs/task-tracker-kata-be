@@ -1,5 +1,6 @@
 package com.tasktracker.domain
 
+import java.time.LocalDate
 import java.util.UUID
 
 interface TaskRepository {
@@ -7,7 +8,11 @@ interface TaskRepository {
 
     fun findById(id: UUID): Task?
 
-    fun findAll(): List<Task>
+    fun findAll(
+        user: String? = null,
+        creationDate: LocalDate? = null,
+        isCompleted: Boolean? = null,
+    ): List<Task>
 
     fun delete(id: UUID): Task?
 }
