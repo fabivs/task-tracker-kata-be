@@ -17,7 +17,5 @@ class InMemoryTaskRepository : TaskRepository {
 
     override fun findAll(): List<Task> = tasksStore.values.toList()
 
-    override fun delete(id: UUID) {
-        tasksStore.remove(id)
-    }
+    override fun delete(id: UUID): Task? = tasksStore.remove(id)
 }

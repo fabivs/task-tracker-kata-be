@@ -39,9 +39,15 @@ class InMemoryTaskRepositoryTest {
         val task = Task.create(user = "user1", title = "Buy milk")
 
         repository.save(task)
-        repository.delete(task.id)
+        val deleted = repository.delete(task.id)
 
+        assertEquals(task, deleted)
         assertNull(repository.findById(task.id))
         assertTrue(repository.findAll().isEmpty())
+    }
+
+    @Test
+    fun `delete returns null when the task does not exist`() {
+        assertNull(repository.delete(UUID.randomUUID()))
     }
 }

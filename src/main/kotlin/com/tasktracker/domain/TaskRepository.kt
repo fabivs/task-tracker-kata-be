@@ -9,5 +9,5 @@ interface TaskRepository {
 
     fun findAll(): List<Task>
 
-    fun delete(id: UUID)
+    fun delete(id: UUID): Task?
 }
