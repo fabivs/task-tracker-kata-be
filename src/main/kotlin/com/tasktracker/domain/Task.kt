@@ -5,7 +5,8 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 
 @ConsistentCopyVisibility
-data class Task private constructor(
+data class Task
+private constructor(
     val id: UUID,
     val user: String,
     val title: String,
@@ -19,17 +20,18 @@ data class Task private constructor(
             id: UUID = UUID.randomUUID(),
             user: String,
             title: String,
-            description: String = ""
-        ) = Task(
-            id = id,
-            user = user,
-            title = title,
-            description = description,
-            creationDate = Clock.System.now(),
-            isCompleted = false,
-            completionDate = null
-        )
-
+            description: String = "",
+        ) =
+            Task(
+                id = id,
+                user = user,
+                title = title,
+                description = description,
+                creationDate = Clock.System.now(),
+                isCompleted = false,
+                completionDate = null,
+            )
     }
+
     fun complete() = copy(isCompleted = true, completionDate = Clock.System.now())
 }

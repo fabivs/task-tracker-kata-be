@@ -1,4 +1,3 @@
 package com.tasktracker.usecase
 
-class DeleteTaskUseCase {
-}
+class DeleteTaskUseCase {}
