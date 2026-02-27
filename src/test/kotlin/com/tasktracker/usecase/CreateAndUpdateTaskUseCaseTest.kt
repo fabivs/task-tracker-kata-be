@@ -10,8 +10,10 @@ import kotlin.test.assertTrue
 
 class CreateAndUpdateTaskUseCaseTest {
 
-    // NOTE: there is no need to mock the repository because it's an In-Memory implementation anyway.
-    // With a database implementation, then it would be mocked, to allow this test to be a unit test of the UseCase.
+    // NOTE: there is no need to mock the repository because it's an In-Memory implementation
+    // anyway.
+    // With a database implementation, then it would be mocked, to allow this test to be a unit test
+    // of the UseCase.
     private val repository = InMemoryTaskRepository()
     private val useCase = CreateAndUpdateTaskUseCase(repository)
 
@@ -32,14 +34,16 @@ class CreateAndUpdateTaskUseCaseTest {
     fun `update changes only the provided fields and persists the result`() {
         val task = useCase.create(user = "user1", title = "Buy milk", description = "Whole milk")
 
-        val taskWithUpdatedTitle = useCase.update(id = task.id, title = "Buy oat milk", description = null)
+        val taskWithUpdatedTitle =
+            useCase.update(id = task.id, title = "Buy oat milk", description = null)
 
         assertNotNull(taskWithUpdatedTitle)
         assertEquals("Buy oat milk", taskWithUpdatedTitle.title)
         assertEquals("Whole milk", taskWithUpdatedTitle.description)
         assertEquals(taskWithUpdatedTitle, repository.findById(task.id))
 
-        val taskWithUpdatedDescription = useCase.update(id = taskWithUpdatedTitle.id, title = null, description = "")
+        val taskWithUpdatedDescription =
+            useCase.update(id = taskWithUpdatedTitle.id, title = null, description = "")
         assertNotNull(taskWithUpdatedDescription)
         assertEquals("", taskWithUpdatedDescription.description)
         assertEquals("Buy oat milk", taskWithUpdatedDescription.title)
@@ -47,7 +51,12 @@ class CreateAndUpdateTaskUseCaseTest {
 
     @Test
     fun `update returns null when the task does not exist`() {
-        val result = useCase.update(id = java.util.UUID.randomUUID(), title = "Buy oat milk", description = null)
+        val result =
+            useCase.update(
+                id = java.util.UUID.randomUUID(),
+                title = "Buy oat milk",
+                description = null,
+            )
 
         assertNull(result)
     }

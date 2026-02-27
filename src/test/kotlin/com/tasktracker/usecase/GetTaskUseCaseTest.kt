@@ -10,8 +10,10 @@ import kotlin.test.assertTrue
 
 class GetTaskUseCaseTest {
 
-    // NOTE: there is no need to mock the repository because it's an In-Memory implementation anyway.
-    // With a database implementation, then it would be mocked, to allow this test to be a unit test of the UseCase.
+    // NOTE: there is no need to mock the repository because it's an In-Memory implementation
+    // anyway.
+    // With a database implementation, then it would be mocked, to allow this test to be a unit test
+    // of the UseCase.
     private val repository = InMemoryTaskRepository()
     private val useCase = GetTaskUseCase(repository)
 
