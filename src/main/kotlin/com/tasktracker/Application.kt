@@ -1,5 +1,6 @@
 package com.tasktracker
 
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -16,5 +17,10 @@ fun Application.module() {
     val dependencyContainer = DependencyContainer()
     configureRouting(dependencyContainer)
 
-    install(ContentNegotiation) { jackson { registerModule(JavaTimeModule()) } }
+    install(ContentNegotiation) {
+        jackson {
+            registerModule(JavaTimeModule())
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        }
+    }
 }
