@@ -122,24 +122,21 @@ Run the tests:
 make test
 ```
 
-## Within a Docker container
+## Run with Docker
 
-A `Dockerfile` has been provided to build a docker image for the project.
+A `Dockerfile` and `docker-compose.yml` are provided to run the full stack of the services.
+The `docker-compose.yml` runs both the frontend and the backend together and expects the frontend
+repository to be cloned at `../task-tracker-kata-fe` relative to this project.
 
-Build the docker image for the project:
-
-```
-make build-docker
-```
-
-Run the image (on port 8080):
-
-```
-make run-docker
+Run the entire stack with docker using the command:
+```bash
+docker compose up --build
 ```
 
-Alternatively, use `docker-compose` to build and run in one step:
+The backend API will be available at `http://localhost:8080`.
+The frontend website will be available at `http://localhost:5173`.
 
-```
-docker-compose up --build
+To stop everything:
+```bash
+docker compose down
 ```
