@@ -37,7 +37,31 @@ manage a simple to-do list.
 with a single user.
 - **CI/CD Workflow**
 - **API Routes in NextJS**
+
 You can also incorporate any additional features you deem appropriate.
+
+# Solution
+
+The project has been implemented in Kotlin with Ktor (a simple and minimalistic web framework).
+Dependency injection and Use case patterns are used to decouple the business logic from the external Routing.
+
+- REST endpoints are defined in the `Routing.kt` file.
+- Use cases are defined in the `usecase` package and contain the core business logic of the application.
+- The storage repository is a simple in memory representation with a `ConcurrentHashMap` with the tasks information.
+- A `DependencyContainer` class has been defined to instantiate the components, but, given the simple scope of the 
+  project, there is currently no form of dependency injection that was required to be implemented.
+
+Tests:
+- `RoutingTest` contains the Integration tests over the endpoints of the application
+- the `domain` and `usecase` packages contain Unit tests
+- the `repository` package contains the repository tests, which normally would be Integration tests, but in this case,
+  because the repository is a simple in-memory representation, they are basically Unit tests as well.
+
+## Differences between actual production code
+
+- tests for the usecases would have to mock the Repository, in order to be Unit tests, in this case was not necessary
+  for the reasons stated above.
+
 
 # Run the project
 
