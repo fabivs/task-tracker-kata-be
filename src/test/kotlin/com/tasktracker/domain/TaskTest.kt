@@ -21,4 +21,17 @@ class TaskTest {
         assertTrue(completedTask.isCompleted)
         assertNotNull(completedTask.completionDate)
     }
+
+    @Test
+    fun `complete called on an already completed task does not update the completionDate`() {
+        val task = Task.create(user = "user1", title = "Buy milk")
+
+        val firstCompletion = task.complete()
+        val originalCompletionDate = firstCompletion.completionDate
+
+        val secondCompletion = firstCompletion.complete()
+
+        assertEquals(originalCompletionDate, secondCompletion.completionDate)
+        assertTrue(secondCompletion.isCompleted)
+    }
 }

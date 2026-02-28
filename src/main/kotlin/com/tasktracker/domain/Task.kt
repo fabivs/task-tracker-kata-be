@@ -37,5 +37,6 @@ private constructor(
     fun update(title: String? = null, description: String? = null) =
         copy(title = title ?: this.title, description = description ?: this.description)
 
-    fun complete() = copy(isCompleted = true, completionDate = LocalDateTime.now())
+    fun complete() =
+        if (isCompleted) this else copy(isCompleted = true, completionDate = LocalDateTime.now())
 }
