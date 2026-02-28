@@ -35,7 +35,7 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
         }
 
         get("/tasks/{id}") {
-            val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+            val id = getUuidFromQueryParams(call)
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
@@ -71,7 +71,7 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
         }
 
         patch("/tasks/{id}") {
-            val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+            val id = getUuidFromQueryParams(call)
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@patch
@@ -102,7 +102,7 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
         }
 
         patch("/tasks/{id}/complete") {
-            val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+            val id = getUuidFromQueryParams(call)
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@patch
@@ -118,7 +118,7 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
         }
 
         delete("/tasks/{id}") {
-            val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+            val id = getUuidFromQueryParams(call)
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@delete
@@ -134,6 +134,9 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
         }
     }
 }
+
+private fun getUuidFromQueryParams(call: RoutingCall): UUID? =
+    call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
 
 data class CreateTaskRequest(val user: String?, val title: String?, val description: String = "") {
     fun isValid() = !user.isNullOrBlank() && !title.isNullOrBlank()
