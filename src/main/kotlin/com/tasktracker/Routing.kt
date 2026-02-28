@@ -5,13 +5,31 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.time.LocalDate
 import java.util.*
 
 fun Application.configureRouting(dependencyContainer: DependencyContainer) {
     routing {
         get("/tasks") {
             application.log.info("Received request: GET /tasks")
-            val tasks = dependencyContainer.getTaskUseCase.getAll()
+
+            val user = call.request.queryParameters["user"]
+            val creationDate =
+                call.request.queryParameters["creationDate"]?.let {
+                    runCatching { LocalDate.parse(it) }.getOrNull()
+                }
+            val isCompleted = call.request.queryParameters["isCompleted"]?.toBooleanStrictOrNull()
+
+            val tasks =
+                if (user == null && creationDate == null && isCompleted == null) {
+                    dependencyContainer.getTaskUseCase.getAll()
+                } else {
+                    dependencyContainer.getTaskUseCase.getFiltered(
+                        user = user,
+                        creationDate = creationDate,
+                        isCompleted = isCompleted,
+                    )
+                }
             application.log.info("Responding with ${tasks.size} tasks")
             call.respond(tasks)
         }
@@ -42,11 +60,12 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val task = dependencyContainer.createAndUpdateTaskUseCase.create(
-                user = request.user!!,
-                title = request.title!!,
-                description = request.description,
-            )
+            val task =
+                dependencyContainer.createAndUpdateTaskUseCase.create(
+                    user = request.user!!,
+                    title = request.title!!,
+                    description = request.description,
+                )
             application.log.info("Responding with created task: ${task.id}")
             call.respond(HttpStatusCode.Created, task)
         }
@@ -66,11 +85,12 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
             }
             application.log.info("Received request: PATCH /tasks/$id")
 
-            val task = dependencyContainer.createAndUpdateTaskUseCase.update(
-                id = id,
-                title = title,
-                description = description,
-            )
+            val task =
+                dependencyContainer.createAndUpdateTaskUseCase.update(
+                    id = id,
+                    title = title,
+                    description = description,
+                )
 
             if (task == null) {
                 call.respond(HttpStatusCode.NotFound)

@@ -30,10 +30,11 @@ class RoutingTest {
     fun `GET task returns 200 with the task corresponding to the requested id`() = testApplication {
         application { module() }
 
-        val createResponse = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val createResponse =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
+            }
         val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
 
         val response = client.get("/tasks/$id")
@@ -50,23 +51,106 @@ class RoutingTest {
     }
 
     @Test
-    fun `GET task returns 404 not found if the task for the requested id does not exist`() = testApplication {
+    fun `GET task returns 404 not found if the task for the requested id does not exist`() =
+        testApplication {
+            application { module() }
+
+            val id = UUID.randomUUID()
+            val response = client.get("/tasks/$id")
+
+            assertEquals(HttpStatusCode.NotFound, response.status)
+        }
+
+    @Test
+    fun `GET tasks filters by user`() = testApplication {
         application { module() }
 
-        val id = UUID.randomUUID()
-        val response = client.get("/tasks/$id")
+        client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"user": "alice", "title": "Alice task"}""")
+        }
+        client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"user": "bob", "title": "Bob task"}""")
+        }
 
-        assertEquals(HttpStatusCode.NotFound, response.status)
+        val response = client.get("/tasks?user=alice")
+        assertEquals(HttpStatusCode.OK, response.status)
+
+        val tasks = mapper.readValue<List<Map<String, Any>>>(response.bodyAsText())
+        assertEquals(1, tasks.size)
+        assertEquals("alice", tasks[0]["user"])
+        assertEquals("Alice task", tasks[0]["title"])
+    }
+
+    @Test
+    fun `GET tasks filters by isCompleted false`() = testApplication {
+        application { module() }
+
+        client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"user": "alice", "title": "Task one"}""")
+        }
+        client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"user": "alice", "title": "Task two"}""")
+        }
+
+        val response = client.get("/tasks?isCompleted=false")
+        assertEquals(HttpStatusCode.OK, response.status)
+
+        val tasks = mapper.readValue<List<Map<String, Any>>>(response.bodyAsText())
+        assertEquals(2, tasks.size)
+        assertTrue(tasks.all { it["isCompleted"] == false })
+    }
+
+    @Test
+    fun `GET tasks filters by creationDate today returns all tasks created today`() =
+        testApplication {
+            application { module() }
+
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Task one"}""")
+            }
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "bob", "title": "Task two"}""")
+            }
+
+            val today = java.time.LocalDate.now().toString()
+            val response = client.get("/tasks?creationDate=$today")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val tasks = mapper.readValue<List<Map<String, Any>>>(response.bodyAsText())
+            assertEquals(2, tasks.size)
+        }
+
+    @Test
+    fun `GET tasks with no matching filter returns empty list`() = testApplication {
+        application { module() }
+
+        client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"user": "alice", "title": "Task one"}""")
+        }
+
+        val response = client.get("/tasks?user=nobody")
+        assertEquals(HttpStatusCode.OK, response.status)
+
+        val tasks = mapper.readValue<List<Map<String, Any>>>(response.bodyAsText())
+        assertEquals(0, tasks.size)
     }
 
     @Test
     fun `POST tasks creates a task and returns 201 with the created task`() = testApplication {
         application { module() }
 
-        val response = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val response =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
+            }
 
         assertEquals(HttpStatusCode.Created, response.status)
         val responseMap = mapper.readValue<Map<String, Any>>(response.bodyAsText())
@@ -82,29 +166,33 @@ class RoutingTest {
     fun `POST tasks returns a 400 bad request if the request body is invalid`() = testApplication {
         application { module() }
 
-        val responseNoUser = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val responseNoUser =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"title": "Buy milk", "description": "Whole milk"}""")
+            }
 
         assertEquals(HttpStatusCode.BadRequest, responseNoUser.status)
-        val responseNoTitle = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "description": "Whole milk"}""")
-        }
+        val responseNoTitle =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "description": "Whole milk"}""")
+            }
 
         assertEquals(HttpStatusCode.BadRequest, responseNoTitle.status)
 
-        val responseEmptyUser = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "", "title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val responseEmptyUser =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "", "title": "Buy milk", "description": "Whole milk"}""")
+            }
 
         assertEquals(HttpStatusCode.BadRequest, responseEmptyUser.status)
-        val responseEmptyTitle = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "", "description": "Whole milk"}""")
-        }
+        val responseEmptyTitle =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "", "description": "Whole milk"}""")
+            }
 
         assertEquals(HttpStatusCode.BadRequest, responseEmptyTitle.status)
     }
@@ -113,10 +201,11 @@ class RoutingTest {
     fun `PATCH tasks happy path - successfully update a task`() = testApplication {
         application { module() }
 
-        val createResponse = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val createResponse =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
+            }
         val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
 
         val updateResponse = client.patch("/tasks/$id?title=Buy+oat+milk&description=2%25+fat")
@@ -132,10 +221,11 @@ class RoutingTest {
     fun `PATCH tasks updates only the title when description is absent`() = testApplication {
         application { module() }
 
-        val createResponse = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val createResponse =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
+            }
         val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
 
         val updateResponse = client.patch("/tasks/$id?title=Buy+oat+milk")
@@ -149,10 +239,11 @@ class RoutingTest {
     fun `PATCH tasks updates only the description when title is absent`() = testApplication {
         application { module() }
 
-        val createResponse = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
-        }
+        val createResponse =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
+            }
         val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
 
         val updateResponse = client.patch("/tasks/$id?description=Skimmed+milk")
@@ -170,17 +261,21 @@ class RoutingTest {
         assertEquals(HttpStatusCode.BadRequest, responseInvalidId.status)
 
         val responseMissingId = client.patch("/tasks/?title=Buy+oat+milk")
-        assertTrue(responseMissingId.status == HttpStatusCode.BadRequest || responseMissingId.status == HttpStatusCode.NotFound)
+        assertTrue(
+            responseMissingId.status == HttpStatusCode.BadRequest ||
+                responseMissingId.status == HttpStatusCode.NotFound
+        )
     }
 
     @Test
     fun `PATCH tasks returns 400 when title is an empty string`() = testApplication {
         application { module() }
 
-        val createResponse = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk"}""")
-        }
+        val createResponse =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk"}""")
+            }
         val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
 
         val updateResponse = client.patch("/tasks/$id?title=")
@@ -188,18 +283,22 @@ class RoutingTest {
     }
 
     @Test
-    fun `PATCH tasks updates description to empty string when description is empty`() = testApplication {
-        application { module() }
+    fun `PATCH tasks updates description to empty string when description is empty`() =
+        testApplication {
+            application { module() }
 
-        val createResponse = client.post("/tasks") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"user": "alice", "title": "Buy milk", "description": "Whole milk"}""")
+            val createResponse =
+                client.post("/tasks") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        """{"user": "alice", "title": "Buy milk", "description": "Whole milk"}"""
+                    )
+                }
+            val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
+
+            val updateResponse = client.patch("/tasks/$id?description=")
+            assertEquals(HttpStatusCode.OK, updateResponse.status)
+            val updated = mapper.readValue<Map<String, Any>>(updateResponse.bodyAsText())
+            assertEquals("", updated["description"])
         }
-        val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
-
-        val updateResponse = client.patch("/tasks/$id?description=")
-        assertEquals(HttpStatusCode.OK, updateResponse.status)
-        val updated = mapper.readValue<Map<String, Any>>(updateResponse.bodyAsText())
-        assertEquals("", updated["description"])
-    }
 }
