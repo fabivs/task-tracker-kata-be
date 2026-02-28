@@ -11,16 +11,18 @@ group = "com.tasktracker"
 
 version = "0.0.1"
 
-application { mainClass = "io.ktor.server.netty.EngineMain" }
+application { mainClass = "com.tasktracker.ApplicationKt" }
 
 kotlin { jvmToolchain(21) }
 
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-server-content-negotiation")
+    implementation("io.ktor:ktor-serialization-jackson")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
