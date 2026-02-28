@@ -301,4 +301,41 @@ class RoutingTest {
             val updated = mapper.readValue<Map<String, Any>>(updateResponse.bodyAsText())
             assertEquals("", updated["description"])
         }
+
+    @Test
+    fun `DELETE tasks deletes a task and returns 204 no content`() = testApplication {
+        application { module() }
+
+        val createResponse =
+            client.post("/tasks") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user": "alice", "title": "Buy milk"}""")
+            }
+        val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
+
+        val deleteResponse = client.delete("/tasks/$id")
+        assertEquals(HttpStatusCode.NoContent, deleteResponse.status)
+
+        val getResponse = client.get("/tasks/$id")
+        assertEquals(HttpStatusCode.NotFound, getResponse.status)
+    }
+
+    @Test
+    fun `DELETE tasks returns 404 when task does not exist`() = testApplication {
+        application { module() }
+
+        val id = UUID.randomUUID()
+        val response = client.delete("/tasks/$id")
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `DELETE tasks returns 400 for invalid UUID`() = testApplication {
+        application { module() }
+
+        val response = client.delete("/tasks/not-a-uuid")
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
 }

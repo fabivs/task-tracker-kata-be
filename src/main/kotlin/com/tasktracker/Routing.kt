@@ -100,6 +100,22 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
             application.log.info("Responding with updated task: ${task.id}")
             call.respond(task)
         }
+
+        delete("/tasks/{id}") {
+            val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@delete
+            }
+            application.log.info("Received request: DELETE /tasks/$id")
+            val task = dependencyContainer.deleteTaskUseCase.delete(id)
+            if (task == null) {
+                call.respond(HttpStatusCode.NotFound)
+                return@delete
+            }
+            application.log.info("Deleted task: $id")
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 }
 
