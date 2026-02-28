@@ -59,9 +59,16 @@ Tests:
 
 ## Differences between actual production code
 
-- tests for the usecases would have to mock the Repository, in order to be Unit tests, in this case was not necessary
-  for the reasons stated above.
+There are various things kept simple for the purposes of this exercise that in a real production codebase would be
+handled in a more robust manner, such as:
 
+- Using an in-memory repository instead of an actual database instance.
+- No authentication system has been implemented, and the user that owns the note is just passed as a query param.
+- The server host and port (`0.0.0.0:8080`) are currently hardcoded in `Application.kt`.
+  In a real production environment these would be extracted, for example, as environment variables.
+- The input sanitization assumes that JSONs are not malformed and that the provided strings have reasonable lengths.
+- tests for the use cases would normally have to mock the Repository in order to be Unit tests. In this case was not
+  necessary because it is a simple in-memory representation, and not an external service.
 
 # Run the project
 
