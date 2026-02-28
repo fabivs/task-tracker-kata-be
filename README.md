@@ -86,9 +86,28 @@ make run
 
 The APIs will be available locally at: <http://127.0.0.1:8080>.
 
-Example usages: -- TODO: add example APIs
+Example usages:
 
-- `GET http://127.0.0.1:8080/xxx/yyy`
+```
+# Create a task
+POST http://127.0.0.1:8080/tasks
+{"user": "alice", "title": "Buy milk", "description": "Whole milk"}
+
+# Get all tasks (filters are optional)
+GET http://127.0.0.1:8080/tasks?user=alice&isCompleted=false&creationDate=2026-02-28
+
+# Get a task by id
+GET http://127.0.0.1:8080/tasks/{id}
+
+# Update a task's title and/or description
+PATCH http://127.0.0.1:8080/tasks/{id}?title=Buy+oat+milk&description=Skimmed
+
+# Mark a task as completed
+PATCH http://127.0.0.1:8080/tasks/{id}/complete
+
+# Delete a task
+DELETE http://127.0.0.1:8080/tasks/{id}
+```
 
 Run the tests:
 
@@ -110,3 +129,10 @@ Run the image (on port 8080):
 
 ```
 make run-docker
+```
+
+Alternatively, use `docker-compose` to build and run in one step:
+
+```
+docker-compose up --build
+```
