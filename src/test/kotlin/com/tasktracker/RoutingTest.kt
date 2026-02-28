@@ -338,4 +338,58 @@ class RoutingTest {
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
+
+    @Test
+    fun `PATCH complete marks the task as completed and returns 200 with the task`() =
+        testApplication {
+            application { module() }
+
+            val createResponse =
+                client.post("/tasks") {
+                    contentType(ContentType.Application.Json)
+                    setBody("""{"user": "alice", "title": "Buy milk"}""")
+                }
+            val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
+
+            val completeResponse = client.patch("/tasks/$id/complete")
+            assertEquals(HttpStatusCode.OK, completeResponse.status)
+
+            val task = mapper.readValue<Map<String, Any>>(completeResponse.bodyAsText())
+            assertEquals(true, task["isCompleted"])
+            assertNotNull(task["completionDate"])
+        }
+
+    @Test
+    fun `PATCH complete returns 404 when task does not exist`() = testApplication {
+        application { module() }
+
+        val id = UUID.randomUUID()
+        val response = client.patch("/tasks/$id/complete")
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `PATCH complete called on an already completed task returns 200 with the task unchanged`() =
+        testApplication {
+            application { module() }
+
+            val createResponse =
+                client.post("/tasks") {
+                    contentType(ContentType.Application.Json)
+                    setBody("""{"user": "alice", "title": "Buy milk"}""")
+                }
+            val id = mapper.readValue<Map<String, Any>>(createResponse.bodyAsText())["id"]
+
+            val firstComplete = client.patch("/tasks/$id/complete")
+            val firstCompletionDate =
+                mapper.readValue<Map<String, Any>>(firstComplete.bodyAsText())["completionDate"]
+
+            val secondComplete = client.patch("/tasks/$id/complete")
+            assertEquals(HttpStatusCode.OK, secondComplete.status)
+
+            val task = mapper.readValue<Map<String, Any>>(secondComplete.bodyAsText())
+            assertEquals(true, task["isCompleted"])
+            assertEquals(firstCompletionDate, task["completionDate"])
+        }
 }

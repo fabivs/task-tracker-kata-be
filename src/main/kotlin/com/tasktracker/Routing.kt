@@ -101,6 +101,22 @@ fun Application.configureRouting(dependencyContainer: DependencyContainer) {
             call.respond(task)
         }
 
+        patch("/tasks/{id}/complete") {
+            val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@patch
+            }
+            application.log.info("Received request: PATCH /tasks/$id/complete")
+            val task = dependencyContainer.createAndUpdateTaskUseCase.complete(id)
+            if (task == null) {
+                call.respond(HttpStatusCode.NotFound)
+                return@patch
+            }
+            application.log.info("Completed task: $id")
+            call.respond(task)
+        }
+
         delete("/tasks/{id}") {
             val id = call.parameters["id"]?.let { runCatching { UUID.fromString(it) }.getOrNull() }
             if (id == null) {
